@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー一覧 | Keita</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --charcoal: #2c2c2c;
+            --charcoal-light: #3a3a3a;
+            --slate: #4a5568;
+            --warm-gray: #f7f7f7;
+            --off-white: #fefefe;
+            --cream: #faf9f7;
+            --accent-teal: #2dd4bf;
+            --accent-coral: #ff6b6b;
+            --accent-gold: #f59e0b;
+            --text-dark: #1a1a1a;
+            --text-medium: #666666;
+            --text-light: #999999;
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-strong: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, var(--warm-gray) 0%, var(--cream) 100%);
+            color: var(--text-dark);
+            line-height: 1.7;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* 背景パターン */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(45, 212, 191, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 107, 107, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(245, 158, 11, 0.02) 0%, transparent 50%);
+        }
+
+        /* ナビゲーション */
+        .navbar-modern {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow-soft);
+            padding: 1.2rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1.6rem;
+            color: var(--charcoal);
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+
+        .navbar-brand:hover {
+            color: var(--accent-teal);
+        }
+
+        .status-badge {
+            background: linear-gradient(135deg, var(--accent-teal), #14b8a6);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* メインコンテナ */
+        .main-section {
+            padding: 6rem 0 2rem 0;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--charcoal);
+            letter-spacing: -1px;
+        }
+
+        .page-subtitle {
+            color: var(--text-medium);
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* 統計カード */
+        .stats-card {
+            background: var(--off-white);
+            border: none;
+            border-radius: 20px;
+            box-shadow: var(--shadow-soft);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-teal), var(--accent-coral), var(--accent-gold));
+        }
+
+        .stats-number {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-label {
+            color: var(--text-medium);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* ユーザーカード */
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .user-card {
+            background: var(--off-white);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-strong);
+            border-color: var(--accent-teal);
+        }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-teal), var(--accent-coral));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .user-card:hover::before {
+            opacity: 1;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-teal), #14b8a6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem auto;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .user-name {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .user-age {
+            color: var(--text-medium);
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        .user-id {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(45, 212, 191, 0.1);
+            color: var(--accent-teal);
+            padding: 0.3rem 0.8rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* 空状態 */
+        .empty-state {
+            background: var(--off-white);
+            border-radius: 24px;
+            padding: 4rem 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+            margin: 2rem 0;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent-coral), #ef4444);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem auto;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .empty-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-bottom: 1rem;
+        }
+
+        .empty-description {
+            color: var(--text-medium);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        /* ボタン */
+        .btn-primary-modern {
+            background: linear-gradient(135deg, var(--accent-teal), #14b8a6);
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 2.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 15px rgba(45, 212, 191, 0.3);
+        }
+
+        .btn-primary-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 212, 191, 0.4);
+            color: white;
+        }
+
+        .btn-secondary-modern {
+            background: transparent;
+            border: 2px solid var(--charcoal);
+            border-radius: 50px;
+            padding: 1rem 2.5rem;
+            font-weight: 600;
+            color: var(--charcoal);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-secondary-modern:hover {
+            background: var(--charcoal);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* アクションボタン */
+        .action-buttons {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .action-buttons .btn {
+            margin: 0.5rem;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .users-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .user-card {
+                padding: 1.5rem;
+            }
+
+            .stats-card {
+                padding: 1.5rem;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+        }
+
+        /* アニメーション */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stagger-1 {
+            animation-delay: 0.1s;
+        }
+
+        .stagger-2 {
+            animation-delay: 0.2s;
+        }
+
+        .stagger-3 {
+            animation-delay: 0.3s;
+        }
+
+        .stagger-4 {
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ナビゲーション -->
+    <nav class="navbar navbar-expand-lg navbar-modern fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">Keita</a>
+            <div class="d-flex align-items-center">
+                <span class="status-badge">
+                    <i class="bi bi-circle-fill me-1" style="font-size: 0.6rem;"></i>
+                    Available
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインセクション -->
+    <section class="main-section">
+        <div class="container">
+            <!-- ページヘッダー -->
+            <div class="page-header fade-in-up">
+                <h1 class="page-title">ユーザー管理</h1>
+                <p class="page-subtitle">登録されているユーザーの一覧</p>
+            </div>
+
+            <!-- 統計カード -->
+            <div class="stats-card fade-in-up stagger-1">
+                <div class="stats-number" th:text="${users.size()}">0</div>
+                <div class="stats-label">
+                    <i class="bi bi-people me-2"></i>
+                    登録ユーザー数
+                </div>
+            </div>
+
+            <!-- ユーザー一覧 -->
+            <div th:if="${!users.isEmpty()}">
+                <div class="users-grid">
+                    <div th:each="user, iterStat : ${users}" class="user-card fade-in-up"
+                        th:classappend="'stagger-' + ${iterStat.index % 4 + 2}">
+                        <div class="user-id">
+                            ID: <span th:text="${user.id}">1</span>
+                        </div>
+                        <div class="user-avatar" th:text="${#strings.substring(user.name, 0, 1)}">
+                            A
+                        </div>
+                        <div class="user-name" th:text="${user.name}">
+                            サンプル太郎
+                        </div>
+                        <div class="user-age">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            <span th:text="${user.age}">25</span>歳
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 空状態 -->
+            <div th:if="${users.isEmpty()}" class="empty-state fade-in-up stagger-2">
+                <div class="empty-icon">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+                <h3 class="empty-title">まだユーザーが登録されていません</h3>
+                <p class="empty-description">
+                    最初のユーザーを登録して始めましょう！
+                </p>
+                <a href="/users" class="btn-primary-modern">
+                    <i class="bi bi-plus-circle"></i>
+                    ユーザーを登録する
+                </a>
+            </div>
+
+            <!-- アクションボタン -->
+            <div class="action-buttons fade-in-up stagger-3">
+                <a href="/users" class="btn-primary-modern">
+                    <i class="bi bi-plus-circle"></i>
+                    新規登録
+                </a>
+                <a href="/" class="btn-secondary-modern">
+                    <i class="bi bi-house"></i>
+                    ホームに戻る
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // アニメーション効果
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function (entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // 要素を監視
+            document.querySelectorAll('.fade-in-up').forEach(el => {
+                observer.observe(el);
+            });
+
+            // カード hover エフェクト強化
+            document.querySelectorAll('.user-card').forEach(card => {
+                card.addEventListener('mouseenter', function () {
+                    this.style.transform = 'translateY(-12px) scale(1.02)';
+                });
+
+                card.addEventListener('mouseleave', function () {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // ボタンのリップル効果
+            document.querySelectorAll('.btn-primary-modern, .btn-secondary-modern').forEach(button => {
+                button.addEventListener('click', function (e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple-effect');
+
+                    this.appendChild(ripple);
+
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+
+            // 統計のカウンターアニメーション
+            const statsNumber = document.querySelector('.stats-number');
+            if (statsNumber) {
+                const target = parseInt(statsNumber.textContent);
+                if (!isNaN(target) && target > 0) {
+                    let current = 0;
+                    const increment = target / 30;
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= target) {
+                            statsNumber.textContent = target;
+                            clearInterval(timer);
+                        } else {
+                            statsNumber.textContent = Math.floor(current);
+                        }
+                    }, 50);
+                }
+            }
+        });
+    </script>
+
+    <style>
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</body>
+
+</html>

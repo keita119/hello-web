@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>けいた | Web Developer</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --charcoal: #2c2c2c;
+            --charcoal-light: #3a3a3a;
+            --slate: #4a5568;
+            --warm-gray: #f7f7f7;
+            --off-white: #fefefe;
+            --cream: #faf9f7;
+            --accent-teal: #2dd4bf;
+            --accent-coral: #ff6b6b;
+            --accent-gold: #f59e0b;
+            --text-dark: #1a1a1a;
+            --text-medium: #666666;
+            --text-light: #999999;
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-strong: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, var(--warm-gray) 0%, var(--cream) 100%);
+            color: var(--text-dark);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        /* 背景パターン */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(45, 212, 191, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 107, 107, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 40% 60%, rgba(245, 158, 11, 0.02) 0%, transparent 50%);
+        }
+
+        /* ナビゲーション */
+        .navbar-modern {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: var(--shadow-soft);
+            padding: 1.2rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1.6rem;
+            color: var(--charcoal);
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-brand:hover {
+            color: var(--accent-teal);
+        }
+
+        .status-badge {
+            background: linear-gradient(135deg, var(--accent-teal), #14b8a6);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* ヒーローセクション */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 2rem 0;
+            position: relative;
+        }
+
+        .hero-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(3.5rem, 8vw, 6rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: var(--charcoal);
+            letter-spacing: -2px;
+        }
+
+        .hero-title .accent {
+            background: linear-gradient(135deg, var(--accent-teal) 0%, var(--accent-coral) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+            color: var(--text-medium);
+            margin-bottom: 1.5rem;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-description {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: var(--text-light);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            line-height: 1.8;
+        }
+
+        /* モダンカード */
+        .card-modern {
+            background: var(--off-white);
+            border: none;
+            border-radius: 24px;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 3rem;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-teal), var(--accent-coral), var(--accent-gold));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card-modern:hover {
+            transform: translateY(-12px);
+            box-shadow: var(--shadow-strong);
+        }
+
+        .card-modern:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-teal), #14b8a6);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .card-modern h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--charcoal);
+        }
+
+        .card-modern p {
+            color: var(--text-medium);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+
+        /* ボタン */
+        .btn-primary-modern {
+            background: linear-gradient(135deg, var(--accent-teal), #14b8a6);
+            border: none;
+            border-radius: 50px;
+            padding: 1rem 2.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.3px;
+            box-shadow: 0 4px 15px rgba(45, 212, 191, 0.3);
+        }
+
+        .btn-primary-modern:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(45, 212, 191, 0.4);
+            color: white;
+        }
+
+        .btn-secondary-modern {
+            background: transparent;
+            border: 2px solid var(--charcoal);
+            border-radius: 50px;
+            padding: 1rem 2.5rem;
+            font-weight: 600;
+            color: var(--charcoal);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-secondary-modern:hover {
+            background: var(--charcoal);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* 統計カード */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.5rem;
+            margin: 4rem 0;
+        }
+
+        .stat-item {
+            background: var(--off-white);
+            padding: 2rem 1.5rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        .stat-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .stat-number {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-teal);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-medium);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* 技術スタック */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .tech-item {
+            background: var(--off-white);
+            padding: 1.5rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+        }
+
+        .tech-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .tech-item:nth-child(1):hover {
+            border-top: 3px solid #e34c26;
+        }
+
+        /* HTML */
+        .tech-item:nth-child(2):hover {
+            border-top: 3px solid #f7df1e;
+        }
+
+        /* JavaScript */
+        .tech-item:nth-child(3):hover {
+            border-top: 3px solid #ed8b00;
+        }
+
+        /* Java */
+        .tech-item:nth-child(4):hover {
+            border-top: 3px solid #007396;
+        }
+
+        /* Servlet */
+        .tech-item:nth-child(5):hover {
+            border-top: 3px solid #6db33f;
+        }
+
+        /* Spring Boot */
+        .tech-item:nth-child(6):hover {
+            border-top: 3px solid #3776ab;
+        }
+
+        /* Python */
+        .tech-item:nth-child(7):hover {
+            border-top: 3px solid #336791;
+        }
+
+        /* SQL */
+        .tech-item:nth-child(8):hover {
+            border-top: 3px solid var(--accent-teal);
+        }
+
+        /* MySQL */
+        .tech-item:nth-child(9):hover {
+            border-top: 3px solid #1f4e79;
+        }
+
+        /* H2 */
+        .tech-item:nth-child(10):hover {
+            border-top: 3px solid #2c2255;
+        }
+
+        /* Eclipse */
+        .tech-item:nth-child(11):hover {
+            border-top: 3px solid #007acc;
+        }
+
+        /* VS Code */
+        .tech-item:nth-child(12):hover {
+            border-top: 3px solid #181717;
+        }
+
+        /* GitHub */
+
+        .tech-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--slate);
+            transition: all 0.3s ease;
+        }
+
+        .tech-item:hover .tech-icon {
+            transform: scale(1.1);
+        }
+
+        .tech-name {
+            font-weight: 600;
+            color: var(--charcoal);
+            font-size: 0.95rem;
+        }
+
+        /* セクション見出し */
+        .section-title {
+            font-family: 'Montserrat', sans-serif;
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: var(--charcoal);
+            letter-spacing: -1px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-medium);
+            font-size: 1.1rem;
+            margin-bottom: 4rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 2rem 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .card-modern {
+                padding: 2rem;
+            }
+        }
+
+        /* スクロールバー */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--warm-gray);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--accent-teal), var(--accent-coral));
+            border-radius: 4px;
+        }
+
+        /* アニメーション */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* プロジェクトカードの特別スタイル */
+        .project-card:nth-child(1) .card-icon {
+            background: linear-gradient(135deg, var(--accent-coral), #ef4444);
+        }
+
+        .project-card:nth-child(2) .card-icon {
+            background: linear-gradient(135deg, var(--accent-gold), #f97316);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ナビゲーション -->
+    <nav class="navbar navbar-expand-lg navbar-modern fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">Keita</a>
+            <div class="d-flex align-items-center">
+                <span class="status-badge">
+                    <i class="bi bi-circle-fill me-1" style="font-size: 0.6rem;"></i>
+                    Available
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ヒーローセクション -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-7">
+                    <h1 class="hero-title fade-in-up">
+                        Creative<br>
+                        <span class="accent">Developer</span>
+                    </h1>
+                    <p class="hero-subtitle fade-in-up">Spring Boot × MySQL で作る現代的なWebアプリケーション</p>
+                    <p class="hero-description fade-in-up">
+                        クリエイティブなアイデアと技術的な専門知識を組み合わせて、
+                        ユーザーに価値を提供するWebソリューションを構築します。
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-3 fade-in-up">
+                        <a href="/users" class="btn-primary-modern">
+                            <i class="bi bi-palette"></i>
+                            作品を見る
+                        </a>
+                        <a href="/users/list" class="btn-secondary-modern">
+                            <i class="bi bi-person-workspace"></i>
+                            システムDemo
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="stats-grid fade-in-up">
+                        <div class="stat-item">
+                            <span class="stat-number">5+</span>
+                            <div class="stat-label">Years Exp</div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">30</span>
+                            <div class="stat-label">Days to Go</div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">100%</span>
+                            <div class="stat-label">MySQL Ready</div>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">15万</span>
+                            <div class="stat-label">Target</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- スキルセクション -->
+    <section class="py-5">
+        <div class="container">
+            <h2 class="section-title fade-in-up">Tech Stack</h2>
+            <p class="section-subtitle fade-in-up">
+                モダンで効率的な開発を支える技術スタック
+            </p>
+
+            <div class="tech-grid">
+                <div class="tech-item fade-in-up">
+                    <i class="bi bi-filetype-html tech-icon"></i>
+                    <div class="tech-name">HTML/CSS</div>
+                </div>
+                <div class="tech-item fade-in-up">
+                    <i class="bi bi-filetype-js tech-icon"></i>
+                    <div class="tech-name">JavaScript</div>
+                </div>
+                <div class="tech-item fade-in-up">
+                    <i class="bi bi-cup-hot tech-icon"></i>
+                    <div class="tech-name">Java</div>
+                </div>
+                <div class="tech-item fade-in-up">
+                    <i class="bi bi-server tech-icon"></i>
+                    <div class="tech-name">Servlet & JSP</div>
+                </div>
+                <div class="tech-item fade-in-up">
+                    <i class="bi bi-lightning tech-icon"></i>
+                    <div class="tech-name">Spring Boot</div>
+                </div>
+                <div class="tech-item fade-in-up">
+                    <i class="bi bi-code-square tech-icon"></i>
+                    <div class="tech-name">Python</div>
+                </div>
+                <div class="tech-item fade-in-up">
+                    <i class="bi bi-database tech-icon"></i>
+                    <div class="tech-name">SQL</div>
+                </div>
+                <div class="tech-item fade-in-up">
+                    <i class="bi bi-database-gear tech-icon"></i>
+                    <div class="tech-name">MySQL</div>
+                </div>
+                <div class="tech-item fade-in-up">
+                    <i class="bi bi-window-desktop tech-icon"></i>
+                    <div class="tech-name">H2 Console</div>
+                </div>
+                <div class="tech-item fade-in-up">
+                    <i class="bi bi-eclipse tech-icon"></i>
+                    <div class="tech-name">Eclipse</div>
+                </div>
+                <div class="tech-item fade-in-up">
+                    <i class="bi bi-code tech-icon"></i>
+                    <div class="tech-name">VS Code</div>
+                </div>
+                <div class="tech-item fade-in-up">
+                    <i class="bi bi-github tech-icon"></i>
+                    <div class="tech-name">GitHub</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- プロジェクトセクション -->
+    <section class="py-5 mt-5">
+        <div class="container">
+            <h2 class="section-title fade-in-up">Featured Projects</h2>
+            <p class="section-subtitle fade-in-up">
+                実際に動作するプロジェクトをご覧ください
+            </p>
+
+            <div class="row g-4">
+                <div class="col-lg-6 project-card">
+                    <div class="card-modern fade-in-up">
+                        <div class="card-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h3>User Management System</h3>
+                        <p>Spring Boot と MySQL を使用した本格的なユーザー管理システム。認証機能とレスポンシブUIを実装。</p>
+                        <a href="/users" class="btn-secondary-modern">
+                            <i class="bi bi-arrow-up-right"></i>
+                            プロジェクトを見る
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 project-card">
+                    <div class="card-modern fade-in-up">
+                        <div class="card-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h3>Analytics Dashboard</h3>
+                        <p>リアルタイムデータ分析とユーザー行動追跡を可能にする高性能ダッシュボード。</p>
+                        <a href="/users/list" class="btn-secondary-modern">
+                            <i class="bi bi-arrow-up-right"></i>
+                            デモを見る
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- フッター -->
+    <footer class="py-5 mt-5" style="background: var(--warm-gray); border-top: 1px solid rgba(0,0,0,0.05);">
+        <div class="container text-center">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0" style="color: var(--text-medium);">
+                        © 2025 Keita. All rights reserved.
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex justify-content-md-end justify-content-center gap-3 mt-3 mt-md-0">
+                        <a href="#" style="color: var(--text-medium); font-size: 1.2rem;">
+                            <i class="bi bi-github"></i>
+                        </a>
+                        <a href="#" style="color: var(--text-medium); font-size: 1.2rem;">
+                            <i class="bi bi-linkedin"></i>
+                        </a>
+                        <a href="#" style="color: var(--text-medium); font-size: 1.2rem;">
+                            <i class="bi bi-envelope"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // スクロールアニメーション
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function (entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            // フェードインアニメーション要素を監視
+            document.querySelectorAll('.fade-in-up').forEach((el, index) => {
+                el.style.transitionDelay = `${index * 0.1}s`;
+                observer.observe(el);
+            });
+
+            // カウンターアニメーション
+            function animateCounters() {
+                const counters = document.querySelectorAll('.stat-number');
+                counters.forEach(counter => {
+                    const target = counter.innerText;
+                    if (target.includes('万') || target === '∞' || target.includes('%') || target.includes('+')) return;
+
+                    const targetNum = parseInt(target);
+                    if (isNaN(targetNum)) return;
+
+                    let current = 0;
+                    const increment = targetNum / 60;
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= targetNum) {
+                            counter.innerText = targetNum;
+                            clearInterval(timer);
+                        } else {
+                            counter.innerText = Math.floor(current);
+                        }
+                    }, 30);
+                });
+            }
+
+            // 統計が表示されたらアニメーション開始
+            const statsGrid = document.querySelector('.stats-grid');
+            if (statsGrid) {
+                const statsObserver = new IntersectionObserver(function (entries) {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            setTimeout(animateCounters, 500);
+                            statsObserver.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                statsObserver.observe(statsGrid);
+            }
+
+            // ナビバーのスクロール効果
+            window.addEventListener('scroll', function () {
+                const navbar = document.querySelector('.navbar-modern');
+                if (window.scrollY > 50) {
+                    navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+                    navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+                } else {
+                    navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                    navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.08)';
+                }
+            });
+
+            // ボタンのリップル効果
+            document.querySelectorAll('.btn-primary-modern, .btn-secondary-modern').forEach(button => {
+                button.addEventListener('click', function (e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.classList.add('ripple-effect');
+
+                    this.appendChild(ripple);
+
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+        });
+    </script>
+
+    <style>
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+    </style>
+</body>
+
+</html>
